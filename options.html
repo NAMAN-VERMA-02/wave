@@ -1,0 +1,28 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Wave options</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { max-width: 560px; margin: 32px auto; padding: 0 16px; font: 15px/1.6 system-ui, sans-serif; }
+  video { width: 320px; height: 240px; background: #000; border-radius: 8px; transform: scaleX(-1); display: block; margin: 12px 0; }
+  #g { font-size: 22px; font-weight: 700; min-height: 1.4em; }
+  button { font: inherit; padding: 8px 14px; cursor: pointer; }
+  table { border-collapse: collapse; margin-top: 16px; } td { padding: 4px 16px 4px 0; }
+</style>
+<h1>Wave</h1>
+<p>Press the button once to let Wave use your camera. Then try each gesture below; the box shows what the camera sees. The preview closes when you leave this page, and nothing is recorded.</p>
+<button id="go">Allow camera and try gestures</button>
+<video id="v" muted playsinline></video>
+<div id="g" role="status"></div>
+<div id="st"></div>
+<table>
+  <tr><td>✋ Open palm</td><td>Play / pause</td></tr>
+  <tr><td>👍 Thumbs up</td><td>Volume up (hold to repeat)</td></tr>
+  <tr><td>👎 Thumbs down</td><td>Volume down (hold to repeat)</td></tr>
+  <tr><td>✌️ Peace sign</td><td>Forward 10 s</td></tr>
+  <tr><td>☝️ Pointing up</td><td>Back 10 s</td></tr>
+  <tr><td>✊ Fist</td><td>Mute / unmute</td></tr>
+</table>
+<p>Hold a gesture for half a second. Alt+W turns Wave on or off.</p>
+<script src="engine.js"></script>
+<script type="module" src="options.js"></script>

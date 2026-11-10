@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Wave",
+  "version": "0.1.0",
+  "description": "Control any video with hand gestures through your webcam. Runs on your device; nothing is recorded or sent.",
+  "permissions": ["offscreen", "storage", "alarms"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    { "matches": ["http://*/*", "https://*/*"], "js": ["content.js"], "all_frames": true, "run_at": "document_idle" }
+  ],
+  "action": { "default_popup": "popup.html", "default_title": "Wave" },
+  "options_page": "options.html",
+  "commands": {
+    "toggle-wave": { "suggested_key": { "default": "Alt+W" }, "description": "Turn Wave on or off" }
+  },
+  "content_security_policy": { "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'" }
+}
