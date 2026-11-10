@@ -6,8 +6,10 @@
   body { max-width: 560px; margin: 32px auto; padding: 0 16px; font: 15px/1.6 system-ui, sans-serif; }
   video { width: 320px; height: 240px; background: #000; border-radius: 8px; transform: scaleX(-1); display: block; margin: 12px 0; }
   #g { font-size: 22px; font-weight: 700; min-height: 1.4em; }
-  button { font: inherit; padding: 8px 14px; cursor: pointer; }
-  table { border-collapse: collapse; margin-top: 16px; } td { padding: 4px 16px 4px 0; }
+  button, select { font: inherit; padding: 6px 12px; cursor: pointer; }
+  table { border-collapse: collapse; margin-top: 8px; } td { padding: 4px 16px 4px 0; }
+  fieldset { margin-top: 20px; border: 1px solid #8884; border-radius: 8px; }
+  fieldset label { display: block; }
 </style>
 <h1>Wave</h1>
 <p>Press the button once to let Wave use your camera. Then try each gesture below; the box shows what the camera sees. The preview closes when you leave this page, and nothing is recorded.</p>
@@ -15,6 +17,17 @@
 <video id="v" muted playsinline></video>
 <div id="g" role="status"></div>
 <div id="st"></div>
+
+<fieldset>
+  <legend>Features</legend>
+  <label><input type="checkbox" id="away"> Pause when I look away, for
+    <select id="awayMs"><option value="3000">3 s</option><option value="5000">5 s</option><option value="10000">10 s</option></select></label>
+  <label><input type="checkbox" id="sleep"> Pause if my eyes stay closed for a minute (sleep catch)</label>
+  <label><input type="checkbox" id="roommate"> Pause when a second person appears</label>
+  <label><input type="checkbox" id="captions"> Captions when I lean back (YouTube) <button id="cal">Calibrate distance</button> <span id="calst"></span></label>
+  <label><input type="checkbox" id="scrub"> Air scrub: pinch, drag left/right to seek or up/down for volume, release</label>
+</fieldset>
+
 <table>
   <tr><td>✋ Open palm</td><td>Play / pause</td></tr>
   <tr><td>👍 Thumbs up</td><td>Volume up (hold to repeat)</td></tr>
@@ -22,6 +35,7 @@
   <tr><td>✌️ Peace sign</td><td>Forward 10 s</td></tr>
   <tr><td>☝️ Pointing up</td><td>Back 10 s</td></tr>
   <tr><td>✊ Fist</td><td>Mute / unmute</td></tr>
+  <tr><td>🤟 Love sign</td><td>Bookmark this moment</td></tr>
 </table>
 <p>Hold a gesture for half a second. Alt+W turns Wave on or off.</p>
 <script src="engine.js"></script>

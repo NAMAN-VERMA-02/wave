@@ -18,7 +18,7 @@ test('low confidence is ignored', () => {
   assert.deepStrictEqual(run(W.create(), 'Open_Palm', 0, 2000, 0.4), []);
 });
 test('unknown gesture is ignored', () => {
-  assert.deepStrictEqual(run(W.create(), 'ILoveYou', 0, 2000), []);
+  assert.deepStrictEqual(run(W.create(), 'None', 0, 2000), []);
 });
 test('held thumbs-up repeats every 400 ms', () => {
   const f = run(W.create(), 'Thumb_Up', 0, 2000);
@@ -45,4 +45,67 @@ test('camera idles at 2 fps, speeds up near a hand, slows after 5 s', () => {
   assert.equal(e.step({ t: 100, gesture: 'None', score: 0.9 }).fps, 15);
   assert.equal(e.step({ t: 4000, gesture: null, score: 0 }).fps, 15);
   assert.equal(e.step({ t: 6000, gesture: null, score: 0 }).fps, 2);
+});
+
+// ---- phase 2 + 3 ----
+const feed = (e, from, to, mk, dt = 100) => { const out = []; for (let t = from; t < to; t += dt) out.push(...e.step({ t, gesture: null, score: 0, ...mk(t) }).actions.map((a) => a.type + (a.by ?? ''))); return out; };
+const FACE = { n: 1, width: 0.3, eyes: 0.1 };
+
+test('look-away: 2.9 s does nothing, 3.1 s pauses, return resumes once', () => {
+  const e = W.create();
+  assert.deepStrictEqual(feed(e, 0, 2900, () => ({ face: { ...FACE, n: 0 } })), []);
+  const e2 = W.create();
+  assert.deepStrictEqual(feed(e2, 0, 3200, () => ({ face: { ...FACE, n: 0 } })), ['away-pause']);
+  assert.deepStrictEqual(feed(e2, 3200, 4200, () => ({ face: FACE })), ['away-resume']);
+});
+test('return after a short absence does not resume', () => {
+  const e = W.create();
+  feed(e, 0, 2000, () => ({ face: { ...FACE, n: 0 } }));
+  assert.deepStrictEqual(feed(e, 2000, 3000, () => ({ face: FACE })), []);
+});
+test('sleep: blink ignored, 60 s closed fires once', () => {
+  const e = W.create();
+  assert.deepStrictEqual(feed(e, 0, 300, () => ({ face: { ...FACE, eyes: 0.9 } })), []);
+  feed(e, 300, 2000, () => ({ face: FACE }));
+  assert.deepStrictEqual(feed(e, 2000, 70000, () => ({ face: { ...FACE, eyes: 0.9 } }), 1000), ['sleep']);
+});
+test('roommate off by default, pauses at 1 s when on', () => {
+  const two = () => ({ face: { ...FACE, n: 2 } });
+  assert.deepStrictEqual(feed(W.create(), 0, 3000, two), []);
+  assert.deepStrictEqual(feed(W.create(undefined, undefined, { roommate: true }), 0, 3000, two), ['roommate-pause']);
+  assert.deepStrictEqual(feed(W.create(undefined, undefined, { roommate: true }), 0, 700, two), []);
+});
+test('captions use hysteresis between 60% and 75% of baseline', () => {
+  const e = W.create(undefined, undefined, { captions: true, baseline: 0.4 });
+  const at = (w) => () => ({ face: { ...FACE, width: w } });
+  assert.deepStrictEqual(feed(e, 0, 6000, at(0.2)), ['captions']);      // 50% -> on
+  assert.deepStrictEqual(feed(e, 6000, 15000, at(0.28)), []);           // 70%: between limits, stays on
+  assert.deepStrictEqual(feed(e, 15000, 22000, at(0.35)), ['captions']); // 87% -> off
+});
+test('features off emit nothing', () => {
+  const e = W.create(undefined, undefined, { away: false, sleep: false });
+  assert.deepStrictEqual(feed(e, 0, 70000, () => ({ face: { ...FACE, n: 0 } }), 1000), []);
+});
+test('air scrub: drag right = seek forward on release; small move = nothing', () => {
+  const pinch = (x, y = 0.5) => () => ({ pinch: { dist: 0.02, x, y } });
+  const open = { pinch: { dist: 0.2, x: 0.5, y: 0.5 } };
+  let e = W.create();
+  feed(e, 0, 300, pinch(0.7)); feed(e, 300, 600, pinch(0.4)); // image x falls = hand moves right
+  assert.deepStrictEqual(feed(e, 600, 700, () => open), ['seek36']);
+  e = W.create();
+  feed(e, 0, 300, pinch(0.5)); feed(e, 300, 600, pinch(0.49));
+  assert.deepStrictEqual(feed(e, 600, 700, () => open), []);
+});
+test('air scrub: vertical drag up = volume up', () => {
+  const e = W.create();
+  const p = (y) => () => ({ pinch: { dist: 0.02, x: 0.5, y } });
+  feed(e, 0, 300, p(0.7)); feed(e, 300, 600, p(0.4));
+  assert.deepStrictEqual(feed(e, 600, 700, () => ({ pinch: { dist: 0.2, x: 0.5, y: 0.4 } })), ['volume0.3']);
+});
+test('pinch suppresses gestures; bookmark gesture fires', () => {
+  const e = W.create();
+  const f = [];
+  for (let t = 0; t < 1500; t += 50) f.push(...e.step({ t, gesture: 'Closed_Fist', score: 0.9, pinch: { dist: 0.02, x: 0.5, y: 0.5 } }).actions);
+  assert.deepStrictEqual(f, []);
+  assert.deepStrictEqual(run(W.create(), 'ILoveYou', 0, 2000), ['bookmark']);
 });

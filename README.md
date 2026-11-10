@@ -16,6 +16,19 @@ Hold a gesture for half a second.
 | ✌️ Peace sign | Forward 10 s |
 | ☝️ Pointing up | Back 10 s |
 | ✊ Fist | Mute / unmute |
+| 🤟 Love sign | Bookmark this moment (list and Markdown export in the popup) |
+| 🤏 Pinch, drag, release | Air scrub: left/right seeks (full frame = 120 s), up/down changes volume |
+
+## Face features (settings page)
+
+| Feature | Rule | Default |
+|---|---|---|
+| Look-away pause | No face for 3/5/10 s: pause. Back: rewind 5 s and play. Never resumes a video you paused yourself. | on |
+| Sleep catch | Eyes closed 60 s: pause and remember where. The popup shows "You dozed off at 23:41" with a Resume link. | on |
+| Roommate pause | A second face for 1 s: pause. | off |
+| Lean-back captions | Face much smaller than your calibrated baseline for 5 s: YouTube captions on; back close: off. | off |
+
+The face model runs twice a second. Only a URL, title and timestamp are stored (sleep catch, bookmarks). No face data or image is kept.
 
 ## Install (unpacked)
 
@@ -36,7 +49,8 @@ Hold a gesture for half a second.
 - Not tested on a camera by the author before release; please open an issue with your gesture misfires.
 - Seeking on Netflix and similar DRM players may not work, because their players ignore direct time changes.
 - One person, one hand, decent light. Chrome / Chromium only.
-- Roadmap: look-away pause, sleep catch, air scrub, bookmarks.
+- Looking down at a phone can read as closed eyes (sleep catch only pauses, but may misfire). Glasses and dim light affect it.
+- Gesture remapping is not built; the gesture to action map is fixed.
 
 ## Develop
 
@@ -44,6 +58,6 @@ Hold a gesture for half a second.
 node --test test/engine.test.js
 ```
 
-Bundled: `@mediapipe/tasks-vision` 1.2.2 (`vendor/`) and Google's `gesture_recognizer.task` model (`models/`), both Apache-2.0.
+Bundled: `@mediapipe/tasks-vision` 1.2.2 (`vendor/`) and Google's `gesture_recognizer.task` and `face_landmarker.task` models (`models/`), both Apache-2.0.
 
 MIT

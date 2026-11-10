@@ -24,6 +24,13 @@ chrome.runtime.onMessage.addListener((m, sender) => {
   } else if (m.type === 'action') {
     const [id] = [...tabs.entries()].sort((a, b) => b[1].at - a[1].at)[0] || [];
     if (id != null) chrome.tabs.sendMessage(id, { type: 'wave', action: m.action }).catch(() => {});
+  } else if (m.type === 'slept') {
+    chrome.storage.local.set({ slept: { url: m.url, title: m.title, time: m.time, at: Date.now() } });
+  } else if (m.type === 'bookmark') {
+    chrome.storage.local.get({ bookmarks: [] }).then(({ bookmarks }) => {
+      bookmarks.unshift({ url: m.url, title: m.title, time: m.time, at: Date.now() });
+      chrome.storage.local.set({ bookmarks: bookmarks.slice(0, 200) }); // shortcut: capped at 200, oldest dropped
+    });
   } else if (m.type === 'stats') {
     chrome.storage.session.set({ diag: { ...m, at: Date.now() } });
   }

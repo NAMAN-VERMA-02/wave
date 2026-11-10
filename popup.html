@@ -1,13 +1,24 @@
 <!doctype html>
 <meta charset="utf-8">
 <style>
-  :root { color-scheme: light dark; }
-  body { width: 260px; margin: 0; padding: 14px; font: 13px/1.5 system-ui, sans-serif; }
+  :root { color-scheme: light dark; --b: #8884; }
+  body { width: 300px; margin: 0; padding: 14px; font: 13px/1.5 system-ui, sans-serif; }
   label { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
   #s { margin: 10px 0; opacity: .75; }
   a { color: inherit; }
+  #slept { border: 1px solid var(--b); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; }
+  #slept[hidden], #bm[hidden] { display: none; }
+  h2 { font-size: 13px; margin: 14px 0 4px; display: flex; justify-content: space-between; align-items: center; }
+  #list { max-height: 160px; overflow-y: auto; }
+  #list a { display: block; padding: 3px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  button { font: inherit; cursor: pointer; }
 </style>
 <label><input type="checkbox" id="on"> Wave is on</label>
 <div id="s" role="status"></div>
-<a href="options.html" target="_blank">Allow camera / try gestures</a>
+<div id="slept" hidden></div>
+<a href="options.html" target="_blank">Settings, allow camera, try gestures</a>
+<div id="bm" hidden>
+  <h2>Bookmarks <button id="copy">Copy as Markdown</button></h2>
+  <div id="list"></div>
+</div>
 <script src="popup.js"></script>
